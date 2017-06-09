@@ -1,0 +1,13 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "6ZxSmrIx3Jd15aou16oG0HPylP4=",
+			"path": "github.com/gogo/protobuf/proto",
+			"revision": "efccd33a0c20aa078705571d5ddbfa14c8395a63",
+			"revisionTime": "2017-06-06T14:43:17Z"
+		}
+	],
+	"rootPath": "git.rigoiot.com/rigoiot/cdc-mqtt-proto"
+}
