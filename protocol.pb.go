@@ -9,12 +9,15 @@
 
 	It has these top-level messages:
 		CDCMsg
+		CDCClientPresenceEvent
+		CDCSubscriptionEvent
 */
 package pb
 
 import proto "github.com/gogo/protobuf/proto"
 import fmt "fmt"
 import math "math"
+import google_protobuf "github.com/golang/protobuf/ptypes/timestamp"
 
 import io "io"
 
@@ -29,7 +32,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion2 // please upgrade the proto package
 
-// How messages are delivered to the NATS cluster
+// CDCMsg How messages are delivered to the NATS cluster
 type CDCMsg struct {
 	Publisher   string `protobuf:"bytes,1,opt,name=publisher,proto3" json:"publisher,omitempty"`
 	Channel     string `protobuf:"bytes,2,opt,name=channel,proto3" json:"channel,omitempty"`
@@ -110,8 +113,113 @@ func (m *CDCMsg) GetSha256() []byte {
 	return nil
 }
 
+// CDCClientPresenceEvent client connects or disconnects event
+//  {
+//    "clientId": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+//    "timestamp": 1460065214626,
+//    "eventType": "connected",
+//    "sessionIdentifier": "00000000-0000-0000-0000-000000000000",
+//  }
+type CDCClientPresenceEvent struct {
+	ClientId          string                     `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
+	Timestamp         *google_protobuf.Timestamp `protobuf:"bytes,2,opt,name=timestamp" json:"timestamp,omitempty"`
+	EventType         string                     `protobuf:"bytes,3,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`
+	SessionIdentifier string                     `protobuf:"bytes,4,opt,name=session_identifier,json=sessionIdentifier,proto3" json:"session_identifier,omitempty"`
+}
+
+func (m *CDCClientPresenceEvent) Reset()                    { *m = CDCClientPresenceEvent{} }
+func (m *CDCClientPresenceEvent) String() string            { return proto.CompactTextString(m) }
+func (*CDCClientPresenceEvent) ProtoMessage()               {}
+func (*CDCClientPresenceEvent) Descriptor() ([]byte, []int) { return fileDescriptorProtocol, []int{1} }
+
+func (m *CDCClientPresenceEvent) GetClientId() string {
+	if m != nil {
+		return m.ClientId
+	}
+	return ""
+}
+
+func (m *CDCClientPresenceEvent) GetTimestamp() *google_protobuf.Timestamp {
+	if m != nil {
+		return m.Timestamp
+	}
+	return nil
+}
+
+func (m *CDCClientPresenceEvent) GetEventType() string {
+	if m != nil {
+		return m.EventType
+	}
+	return ""
+}
+
+func (m *CDCClientPresenceEvent) GetSessionIdentifier() string {
+	if m != nil {
+		return m.SessionIdentifier
+	}
+	return ""
+}
+
+// CDCSubscriptionEvent client subscribes or unsubscribes to a topic
+//  {
+//    "clientId": "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6",
+//    "timestamp": 1460065214626,
+//    "eventType": "subscribed" | "unsubscribed",
+//    "sessionIdentifier": "00000000-0000-0000-0000-000000000000",
+//    "topics" : ["foo/bar","device/data","dog/cat"]
+//  }
+type CDCSubscriptionEvent struct {
+	ClientId          string                     `protobuf:"bytes,1,opt,name=client_id,json=clientId,proto3" json:"client_id,omitempty"`
+	Timestamp         *google_protobuf.Timestamp `protobuf:"bytes,2,opt,name=timestamp" json:"timestamp,omitempty"`
+	EventType         string                     `protobuf:"bytes,3,opt,name=event_type,json=eventType,proto3" json:"event_type,omitempty"`
+	SessionIdentifier string                     `protobuf:"bytes,4,opt,name=session_identifier,json=sessionIdentifier,proto3" json:"session_identifier,omitempty"`
+	Topics            []string                   `protobuf:"bytes,5,rep,name=topics" json:"topics,omitempty"`
+}
+
+func (m *CDCSubscriptionEvent) Reset()                    { *m = CDCSubscriptionEvent{} }
+func (m *CDCSubscriptionEvent) String() string            { return proto.CompactTextString(m) }
+func (*CDCSubscriptionEvent) ProtoMessage()               {}
+func (*CDCSubscriptionEvent) Descriptor() ([]byte, []int) { return fileDescriptorProtocol, []int{2} }
+
+func (m *CDCSubscriptionEvent) GetClientId() string {
+	if m != nil {
+		return m.ClientId
+	}
+	return ""
+}
+
+func (m *CDCSubscriptionEvent) GetTimestamp() *google_protobuf.Timestamp {
+	if m != nil {
+		return m.Timestamp
+	}
+	return nil
+}
+
+func (m *CDCSubscriptionEvent) GetEventType() string {
+	if m != nil {
+		return m.EventType
+	}
+	return ""
+}
+
+func (m *CDCSubscriptionEvent) GetSessionIdentifier() string {
+	if m != nil {
+		return m.SessionIdentifier
+	}
+	return ""
+}
+
+func (m *CDCSubscriptionEvent) GetTopics() []string {
+	if m != nil {
+		return m.Topics
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*CDCMsg)(nil), "pb.CDCMsg")
+	proto.RegisterType((*CDCClientPresenceEvent)(nil), "pb.CDCClientPresenceEvent")
+	proto.RegisterType((*CDCSubscriptionEvent)(nil), "pb.CDCSubscriptionEvent")
 }
 func (m *CDCMsg) Marshal() (dAtA []byte, err error) {
 	size := m.Size()
@@ -188,6 +296,113 @@ func (m *CDCMsg) MarshalTo(dAtA []byte) (int, error) {
 	return i, nil
 }
 
+func (m *CDCClientPresenceEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CDCClientPresenceEvent) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.ClientId) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintProtocol(dAtA, i, uint64(len(m.ClientId)))
+		i += copy(dAtA[i:], m.ClientId)
+	}
+	if m.Timestamp != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintProtocol(dAtA, i, uint64(m.Timestamp.Size()))
+		n1, err := m.Timestamp.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n1
+	}
+	if len(m.EventType) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintProtocol(dAtA, i, uint64(len(m.EventType)))
+		i += copy(dAtA[i:], m.EventType)
+	}
+	if len(m.SessionIdentifier) > 0 {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintProtocol(dAtA, i, uint64(len(m.SessionIdentifier)))
+		i += copy(dAtA[i:], m.SessionIdentifier)
+	}
+	return i, nil
+}
+
+func (m *CDCSubscriptionEvent) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalTo(dAtA)
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *CDCSubscriptionEvent) MarshalTo(dAtA []byte) (int, error) {
+	var i int
+	_ = i
+	var l int
+	_ = l
+	if len(m.ClientId) > 0 {
+		dAtA[i] = 0xa
+		i++
+		i = encodeVarintProtocol(dAtA, i, uint64(len(m.ClientId)))
+		i += copy(dAtA[i:], m.ClientId)
+	}
+	if m.Timestamp != nil {
+		dAtA[i] = 0x12
+		i++
+		i = encodeVarintProtocol(dAtA, i, uint64(m.Timestamp.Size()))
+		n2, err := m.Timestamp.MarshalTo(dAtA[i:])
+		if err != nil {
+			return 0, err
+		}
+		i += n2
+	}
+	if len(m.EventType) > 0 {
+		dAtA[i] = 0x1a
+		i++
+		i = encodeVarintProtocol(dAtA, i, uint64(len(m.EventType)))
+		i += copy(dAtA[i:], m.EventType)
+	}
+	if len(m.SessionIdentifier) > 0 {
+		dAtA[i] = 0x22
+		i++
+		i = encodeVarintProtocol(dAtA, i, uint64(len(m.SessionIdentifier)))
+		i += copy(dAtA[i:], m.SessionIdentifier)
+	}
+	if len(m.Topics) > 0 {
+		for _, s := range m.Topics {
+			dAtA[i] = 0x2a
+			i++
+			l = len(s)
+			for l >= 1<<7 {
+				dAtA[i] = uint8(uint64(l)&0x7f | 0x80)
+				l >>= 7
+				i++
+			}
+			dAtA[i] = uint8(l)
+			i++
+			i += copy(dAtA[i:], s)
+		}
+	}
+	return i, nil
+}
+
 func encodeFixed64Protocol(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	dAtA[offset+1] = uint8(v >> 8)
@@ -251,6 +466,56 @@ func (m *CDCMsg) Size() (n int) {
 	l = len(m.Sha256)
 	if l > 0 {
 		n += 1 + l + sovProtocol(uint64(l))
+	}
+	return n
+}
+
+func (m *CDCClientPresenceEvent) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.ClientId)
+	if l > 0 {
+		n += 1 + l + sovProtocol(uint64(l))
+	}
+	if m.Timestamp != nil {
+		l = m.Timestamp.Size()
+		n += 1 + l + sovProtocol(uint64(l))
+	}
+	l = len(m.EventType)
+	if l > 0 {
+		n += 1 + l + sovProtocol(uint64(l))
+	}
+	l = len(m.SessionIdentifier)
+	if l > 0 {
+		n += 1 + l + sovProtocol(uint64(l))
+	}
+	return n
+}
+
+func (m *CDCSubscriptionEvent) Size() (n int) {
+	var l int
+	_ = l
+	l = len(m.ClientId)
+	if l > 0 {
+		n += 1 + l + sovProtocol(uint64(l))
+	}
+	if m.Timestamp != nil {
+		l = m.Timestamp.Size()
+		n += 1 + l + sovProtocol(uint64(l))
+	}
+	l = len(m.EventType)
+	if l > 0 {
+		n += 1 + l + sovProtocol(uint64(l))
+	}
+	l = len(m.SessionIdentifier)
+	if l > 0 {
+		n += 1 + l + sovProtocol(uint64(l))
+	}
+	if len(m.Topics) > 0 {
+		for _, s := range m.Topics {
+			l = len(s)
+			n += 1 + l + sovProtocol(uint64(l))
+		}
 	}
 	return n
 }
@@ -564,6 +829,375 @@ func (m *CDCMsg) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
+func (m *CDCClientPresenceEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtocol
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CDCClientPresenceEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CDCClientPresenceEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtocol
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtocol
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ClientId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtocol
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtocol
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Timestamp == nil {
+				m.Timestamp = &google_protobuf.Timestamp{}
+			}
+			if err := m.Timestamp.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EventType", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtocol
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtocol
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.EventType = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SessionIdentifier", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtocol
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtocol
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.SessionIdentifier = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtocol(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtocol
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *CDCSubscriptionEvent) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowProtocol
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= (uint64(b) & 0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: CDCSubscriptionEvent: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: CDCSubscriptionEvent: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ClientId", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtocol
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtocol
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ClientId = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Timestamp", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtocol
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= (int(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthProtocol
+			}
+			postIndex := iNdEx + msglen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Timestamp == nil {
+				m.Timestamp = &google_protobuf.Timestamp{}
+			}
+			if err := m.Timestamp.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EventType", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtocol
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtocol
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.EventType = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field SessionIdentifier", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtocol
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtocol
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.SessionIdentifier = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 5:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Topics", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowProtocol
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= (uint64(b) & 0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthProtocol
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Topics = append(m.Topics, string(dAtA[iNdEx:postIndex]))
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipProtocol(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if skippy < 0 {
+				return ErrInvalidLengthProtocol
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
 func skipProtocol(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
@@ -672,20 +1306,30 @@ var (
 func init() { proto.RegisterFile("protocol.proto", fileDescriptorProtocol) }
 
 var fileDescriptorProtocol = []byte{
-	// 234 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0xe2, 0x2b, 0x28, 0xca, 0x2f,
-	0xc9, 0x4f, 0xce, 0xcf, 0xd1, 0x03, 0x33, 0x84, 0x98, 0x0a, 0x92, 0x94, 0x3e, 0x32, 0x72, 0xb1,
-	0x39, 0xbb, 0x38, 0xfb, 0x16, 0xa7, 0x0b, 0xc9, 0x70, 0x71, 0x16, 0x94, 0x26, 0xe5, 0x64, 0x16,
-	0x67, 0xa4, 0x16, 0x49, 0x30, 0x2a, 0x30, 0x6a, 0x70, 0x06, 0x21, 0x04, 0x84, 0x24, 0xb8, 0xd8,
-	0x93, 0x33, 0x12, 0xf3, 0xf2, 0x52, 0x73, 0x24, 0x98, 0xc0, 0x72, 0x30, 0xae, 0x90, 0x22, 0x17,
-	0x4f, 0x72, 0x7e, 0x5e, 0x49, 0x6a, 0x5e, 0x49, 0x7c, 0x49, 0x65, 0x41, 0xaa, 0x04, 0x33, 0x58,
-	0x9a, 0x1b, 0x2a, 0x16, 0x52, 0x59, 0x90, 0x2a, 0x24, 0xc5, 0xc5, 0x01, 0xb3, 0x5b, 0x82, 0x05,
-	0x2c, 0x0d, 0xe7, 0x0b, 0x89, 0x70, 0xb1, 0x16, 0xa5, 0x16, 0xe4, 0x54, 0x4a, 0xb0, 0x82, 0x25,
-	0x20, 0x1c, 0x90, 0x75, 0x05, 0x89, 0x95, 0x39, 0xf9, 0x89, 0x29, 0x12, 0x6c, 0x0a, 0x8c, 0x1a,
-	0x3c, 0x41, 0x30, 0xae, 0x90, 0x00, 0x17, 0x73, 0xa0, 0x7f, 0xb0, 0x04, 0xbb, 0x02, 0xa3, 0x06,
-	0x6f, 0x10, 0x88, 0x29, 0x24, 0xc6, 0xc5, 0x56, 0x94, 0x5a, 0x92, 0x98, 0x99, 0x27, 0xc1, 0xa1,
-	0xc0, 0xa8, 0xc1, 0x11, 0x04, 0xe5, 0x81, 0xc4, 0x8b, 0x33, 0x12, 0x8d, 0x4c, 0xcd, 0x24, 0xb8,
-	0xc0, 0x46, 0x40, 0x79, 0x4e, 0x02, 0x27, 0x1e, 0xc9, 0x31, 0x5e, 0x78, 0x24, 0xc7, 0xf8, 0xe0,
-	0x91, 0x1c, 0xe3, 0x84, 0xc7, 0x72, 0x0c, 0x49, 0x6c, 0x60, 0xd7, 0x18, 0x03, 0x02, 0x00, 0x00,
-	0xff, 0xff, 0x68, 0xcb, 0x5f, 0x06, 0x22, 0x01, 0x00, 0x00,
+	// 389 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xd4, 0x91, 0xcf, 0xaa, 0xd3, 0x40,
+	0x14, 0xc6, 0x9d, 0x5b, 0x9b, 0x9b, 0x9c, 0x7b, 0x95, 0xeb, 0x70, 0x29, 0x43, 0xd5, 0x18, 0xbb,
+	0xca, 0xc6, 0x14, 0x2a, 0x8a, 0x6b, 0x53, 0x17, 0x5d, 0x88, 0x9a, 0x76, 0x5f, 0xf2, 0xe7, 0xb4,
+	0x1d, 0x48, 0x67, 0x86, 0xcc, 0xb4, 0x90, 0xb7, 0xf0, 0x85, 0xdc, 0xbb, 0x14, 0x7c, 0x01, 0xa9,
+	0x4f, 0xe0, 0x1b, 0x48, 0x26, 0x49, 0x0b, 0xbe, 0x81, 0xbb, 0xf3, 0xfd, 0xbe, 0x43, 0x72, 0xf8,
+	0x0d, 0x3c, 0x56, 0x95, 0x34, 0x32, 0x97, 0x65, 0x64, 0x07, 0x7a, 0xa5, 0xb2, 0xf1, 0x8b, 0xad,
+	0x94, 0xdb, 0x12, 0xa7, 0x96, 0x64, 0x87, 0xcd, 0xd4, 0xf0, 0x3d, 0x6a, 0x93, 0xee, 0x55, 0xbb,
+	0x34, 0xf9, 0x43, 0xc0, 0x89, 0xe7, 0xf1, 0x47, 0xbd, 0xa5, 0xcf, 0xc0, 0x53, 0x87, 0xac, 0xe4,
+	0x7a, 0x87, 0x15, 0x23, 0x01, 0x09, 0xbd, 0xe4, 0x02, 0x28, 0x83, 0xeb, 0x7c, 0x97, 0x0a, 0x81,
+	0x25, 0xbb, 0xb2, 0x5d, 0x1f, 0xe9, 0x4b, 0xb8, 0xcd, 0xa5, 0x30, 0x28, 0xcc, 0xda, 0xd4, 0x0a,
+	0xd9, 0xc0, 0xd6, 0x37, 0x1d, 0x5b, 0xd5, 0x0a, 0xe9, 0x18, 0xdc, 0xfe, 0x38, 0xf6, 0xd0, 0xd6,
+	0xe7, 0x4c, 0xef, 0x61, 0x58, 0xa1, 0x2a, 0x6b, 0x36, 0xb4, 0x45, 0x1b, 0x9a, 0xdf, 0xa9, 0xb4,
+	0x2e, 0x65, 0x5a, 0x30, 0x27, 0x20, 0xe1, 0x6d, 0xd2, 0x47, 0x7a, 0x07, 0x83, 0x2f, 0x9f, 0x96,
+	0xec, 0x3a, 0x20, 0xe1, 0xa3, 0xa4, 0x19, 0xe9, 0x08, 0x9c, 0x0a, 0x4d, 0xca, 0x05, 0x73, 0x03,
+	0x12, 0xba, 0x49, 0x97, 0x1a, 0xae, 0x77, 0xe9, 0xec, 0xcd, 0x5b, 0x06, 0xf6, 0x13, 0x5d, 0x9a,
+	0x7c, 0x23, 0x30, 0x8a, 0xe7, 0x71, 0x5c, 0x72, 0x14, 0xe6, 0x73, 0x85, 0x1a, 0x45, 0x8e, 0x1f,
+	0x8e, 0x28, 0x0c, 0x7d, 0x0a, 0x5e, 0x6e, 0xf1, 0x9a, 0x17, 0x9d, 0x03, 0xb7, 0x05, 0x8b, 0x82,
+	0xbe, 0x03, 0xef, 0xac, 0xcf, 0x4a, 0xb8, 0x99, 0x8d, 0xa3, 0x56, 0x70, 0xd4, 0x0b, 0x8e, 0x56,
+	0xfd, 0x46, 0x72, 0x59, 0xa6, 0xcf, 0x01, 0xf0, 0xf8, 0x8f, 0x20, 0xcf, 0x12, 0xab, 0xe7, 0x15,
+	0x50, 0x8d, 0x5a, 0x73, 0x29, 0xd6, 0xbc, 0x40, 0x61, 0xf8, 0x86, 0x63, 0xd5, 0x89, 0x7a, 0xd2,
+	0x35, 0x8b, 0x73, 0x31, 0xf9, 0x49, 0xe0, 0x3e, 0x9e, 0xc7, 0xcb, 0x43, 0xa6, 0xf3, 0x8a, 0x2b,
+	0xc3, 0xa5, 0xf8, 0x7f, 0xae, 0x6f, 0x5e, 0xc5, 0x48, 0xc5, 0x73, 0xcd, 0x86, 0xc1, 0x20, 0xf4,
+	0x92, 0x2e, 0xbd, 0xbf, 0xfb, 0x7e, 0xf2, 0xc9, 0x8f, 0x93, 0x4f, 0x7e, 0x9d, 0x7c, 0xf2, 0xf5,
+	0xb7, 0xff, 0x20, 0x73, 0xec, 0x59, 0xaf, 0xff, 0x06, 0x00, 0x00, 0xff, 0xff, 0x49, 0xad, 0xcc,
+	0xfe, 0xd9, 0x02, 0x00, 0x00,
 }
